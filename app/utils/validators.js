@@ -1,4 +1,4 @@
-const {Account} = require('./schema/models')
+const {Account} = require('../schema/models')
 const validator = require('email-validator')
 const {getFormattedDate} = require('./utils')
 
@@ -14,7 +14,7 @@ const accountExists = async (res, email) => {
 const domains = ['com', 'in', 'org', 'ru', 'fr', 'eu', 'br', 'net', 'uk']
 const providers = ['gmail', 'yahoo', 'hotmail', 'ymail', 'reddifmail']
 const validateEmail = (res, email) => {
-	if(!validator.validate(email)) {
+	if(!validator.validate(email) || email.split('@')[0].length === 0) {
 		res.json({success: false, body: {error: 'Invalid email address'}})
 		return false
 	}

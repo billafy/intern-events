@@ -1,13 +1,11 @@
 const {
 	Account
 } = require('../schema/models')
-const {hashPassword, comparePassword, generateAccessToken} = require('../auth')
+const {hashPassword, comparePassword, generateAccessToken} = require('../utils/auth')
 const {
 	currentDateTimestamp,
-	getFormattedDate,
-	deleteProfilePicture,
-	deleteResume
-} = require('../utils')
+	getFormattedDate
+} = require('../utils/utils')
 const {
 	accountExists,
 	validateCompanyDetails,
@@ -17,7 +15,11 @@ const {
 	validateContactNumber,
 	validateStudentDetails,
 	validateEmail,
-} = require('../validators')
+} = require('../utils/validators')
+const {
+	deleteProfilePicture,
+	deleteResume
+} = require('../utils/staticStorage')
 
 /* general methods */
 
@@ -166,30 +168,42 @@ const updateEmail = async (req, res) => {
 	const {body: {email}, params: {_id}} = req
 	if(!await accountExists(res, email) || !validateEmail(res, email))
 		return
-	const account = await Account.findByIdAndUpdate(_id, {email})
+	const account = await Account.findByIdAndUpdate(_id, {email}, {new: true})
 	res.json({success: true, body: {message: 'Email updated', account}})
 }
 
 const updatePassword = async (req, res) => {
 	const {body: {password}, params: {_id}} = req
-	if(password.length < 6)
-		return res.json({success: false, body: {error: 'Password too short'}})
+	if(!password)
+		return res.json({success: false, body: {error: 'No password'}})
+	if(!validatePassword(res, password))
+		return
 	const hashedPassword = await hashPassword(password)
-	Account.findByIdAndUpdate(_id, {password: hashedPassword})
+	Account.findByIdAndUpdate(_id, {password: hashedPassword}, {new: true}).exec()
 	res.json({success: true, body: {message: 'Password updated'}})
 }
 
 const updateAccount = async (req, res) => {
-	const {accountType, contactNumber, description, details} = req.body
-	if(!validateContactNumber(contactNumber))
+	const {accountType} = req.account
+	const {_id} = req.params
+	if(!req.body.account)
+		return res.json({success: false, body: {error: 'Incomplete information provided'}})
+	const {
+		contactNumber,
+		description,
+		details,
+	} = req.body.account
+	if(!contactNumber || !details)
+		return res.json({success: false, body: {error: 'Incomplete information provided'}})
+	if(!validateContactNumber(res, contactNumber))
 		return
-	if(accountType === 'student' && !validateStudentDetails(details))
+	if(accountType === 'student' && !validateStudentDetails(res, details))
 		return
-	else if(accountType === 'college' && !validateCollegeDetails(details))
+	else if(accountType === 'college' && !validateCollegeDetails(res, details))
 		return
-	else if(accountType === 'company' && !validateCompanyDetails(details))
+	else if(accountType === 'company' && !validateCompanyDetails(res, details))
 		return
-	const updatedAccount = await Account.findByIdAndUpdate({contactNumber, description, details})
+	const updatedAccount = await Account.findByIdAndUpdate(_id, {contactNumber, description, details}, {new: true})
 	res.json({success: true, body: {message: 'Account updated', account: updatedAccount}})
 }
 

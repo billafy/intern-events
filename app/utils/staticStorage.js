@@ -1,5 +1,7 @@
 const multer = require('multer')
 
+const {unlink} = require('fs')
+
 const profilePictureStorage = multer.diskStorage({
 	destination: 'media/profilePictures/',
 	filename: (req, file, cb) => {
@@ -20,7 +22,23 @@ const resumeStorage = multer.diskStorage({
 })
 const resumeUpload = multer({storage: resumeStorage})
 
+const deleteProfilePicture = async (profilePicture) => {
+	unlink(`./media/profilePictures/${profilePicture}`, (err) => {
+		if(err)
+			return
+	})
+}
+
+const deleteResume = async (resume) => {
+	unlink(`./media/resumes/${resume}`, (err) => {
+		if(err)
+			return
+	})
+}
+
 module.exports ={
 	profilePictureUpload,
-	resumeUpload
+	resumeUpload,
+	deleteProfilePicture,
+	deleteResume
 }

@@ -3,15 +3,16 @@
 
 # Stucture
 	/app contains all the functional code with the MVC structure
+		server - the central server setup
 		/controllers consists of the controller or view functions implementing the business logic
 		/routers routes the requests mapped to the respective urls and forwards to the controller functions
 		/schema has the database models specified
-		auth - several authentication/authorization functions
-		server - the central server setup
-		socketConnection - socket handler for realtime chats
-		staticStorage - utility functions for media storage
-		utils - miscellanous utility functions
-		validators - functions to validate the incoming data
+		/socket socket.io handler for realtime chats
+		/utils
+			auth - several authentication/authorization functions
+			staticStorage - utility functions for media storage
+			utils - miscellanous utility functions
+			validators - functions to validate the incoming data
 	/media stores all kinds of media items such as profile pictures, resumes, etc
 
 	/controllers and /routers both are divided into 3 submodules :-
@@ -19,7 +20,7 @@
 		2) internships and events
 		3) social (posts, user-to-user interactions, messaging)
 
-# REST API URLs
+# REST API
 	Note : All the text based data is in JSON format and the files are passed as FormData
 
 	Accounts

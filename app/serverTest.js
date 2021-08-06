@@ -40,12 +40,8 @@ mongoose.connect(MONGO_URI, {
 	useUnifiedTopology: true,
 	useFindAndModify: false
 })
-mongoose.connection.on('error', () => {
-	console.log('Error connecting to database')
-})
-mongoose.connection.on('open', () => {
-	console.log('Connected to database')
-})
+mongoose.connection.on('error', () => {})
+mongoose.connection.on('open', () => {})
 
 /* api */
 
@@ -53,15 +49,4 @@ app.use('/accounts', accountsRouter)
 app.use('/internEvents', internEventsRouter)
 app.use('/social', socialRouter)
 
-/* making the app listen to a port */
-
-const server = app.listen(port, () => {
-	console.log(`App listening port ${port}`)
-})
-
-/* socket */
-
-const io = socketIo(server)
-io.on('connection', socketConnection)
-
-module.exports = app
+module.exports = app.listen(port)

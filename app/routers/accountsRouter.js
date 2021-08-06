@@ -13,8 +13,8 @@ const {
 	uploadResume,
 	uploadProfilePicture,
 } = require('../controllers/accountsController')
-const {verifyAccessToken} = require('../auth')
-const {profilePictureUpload, resumeUpload} = require('../staticStorage')
+const {verifyAccessToken} = require('../utils/auth')
+const {profilePictureUpload, resumeUpload} = require('../utils/staticStorage')
 
 const router = Router()
 

@@ -24,6 +24,7 @@ const generateAccessToken = (account) => {
 		_id: account._id,
 		email: account.email,
 		password: account.password,
+		accountType: account.accountType
 	}, ACCESS_TOKEN_SECRET)
 }
 

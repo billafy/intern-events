@@ -1,5 +1,3 @@
-const {unlink} = require('fs')
-
 const currentDateTimestamp = () => {
 	const current = new Date()
 
@@ -20,23 +18,7 @@ const getFormattedDate = (ms) => {
 	return `${day}/${month}/${year}`
 }
 
-const deleteProfilePicture = async (profilePicture) => {
-	unlink(`./media/profilePictures/${profilePicture}`, (err) => {
-		if(err)
-			return
-	})
-}
-
-const deleteResume = async (resume) => {
-	unlink(`./media/resumes/${resume}`, (err) => {
-		if(err)
-			return
-	})
-}
-
 module.exports = {
 	currentDateTimestamp,
-	deleteProfilePicture,
-	getFormattedDate,
-	deleteResume
+	getFormattedDate
 }
