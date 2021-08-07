@@ -79,7 +79,7 @@ const createStudentAccount = async (req, res) => {
 	res.status(201).json({success: true, body: {message: 'Account created successfully', account}})
 }
 
-const createCollegeAccount = async () => {
+const createCollegeAccount = async (req, res) => {
 	const {
 		email,
 		password,
@@ -95,7 +95,7 @@ const createCollegeAccount = async () => {
 		!validateEmail(res, email) || 
 		!validatePassword(res, password) || 
 		!validateContactNumber(res, contactNumber) || 
-		!validateAccountDetails(res, data) || 
+		!validateAccountDetails(res, req.body) || 
 		!validateCollegeDetails(res, details)
 	) return
 
@@ -108,7 +108,7 @@ const createCollegeAccount = async () => {
 	res.status(201).json({success: true, body: {message: 'Account created successfully', account}})
 }
 
-const createCompanyAccount = async () => {
+const createCompanyAccount = async (req, res) => {
 	const {
 		email,
 		password,
@@ -123,7 +123,7 @@ const createCompanyAccount = async () => {
 		!validateEmail(res, email) || 
 		!validatePassword(res, password) || 
 		!validateContactNumber(res, contactNumber) || 
-		!validateAccountDetails(res, data) || 
+		!validateAccountDetails(res, req.body) || 
 		!validateCompanyDetails(res, details)
 	) return
 
