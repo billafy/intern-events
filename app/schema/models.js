@@ -45,7 +45,6 @@ const companySchema = new Schema({
 
 const internshipSchema = new Schema({
 	title: String,
-	status: String,
 	description: String,
 	stipend: Number,
 	duration: String,
@@ -54,7 +53,7 @@ const internshipSchema = new Schema({
 	category: String,
 	numberOfPositions: Number,
 	accountId: String,
-	applicatons: [{
+	applications: [{
 		message: String,
 		dateTime: String,
 		status: String,
@@ -82,6 +81,11 @@ const postSchema = new Schema({
 	likes: Number,
 	accountId: String,
 	postedBy: String,
+	comments: [{
+		text: String,
+		commentedBy: String,
+		likes: Number,
+	}]
 })
 
 const messageSchema = new Schema({

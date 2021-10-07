@@ -1,15 +1,14 @@
-const {Router} = require('express')
-const {
-} = require('../controllers/internEventsController')
+const { Router } = require("express");
+const {getInternships} = require("../controllers/internEventsController");
 
-const router = Router()
+const router = Router();
 
-router.get('/getInternships')
+router.get("/getInternships", getInternships);
 
-router.post('/createInternship')
-router.post('/createEvent')
+router.post("/createInternship");
+router.post("/createEvent");
 
-router.put('/updateInternship')
-router.put('/updateEvent')
+router.put("/updateInternship");
+router.put("/updateEvent");
 
-module.exports = router
+module.exports = router;
