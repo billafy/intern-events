@@ -130,8 +130,8 @@ const validateStudentDetails = (res, details) => {
 		});
 		return false;
 	}
-	details.projects.forEach(project => {
-		if(!project.projectName || !project.projectLink) {
+	projects.forEach(project => {
+		if(!project.title || !project.link) {
 			res.json({
 				success: false,
 				body: {
@@ -142,7 +142,7 @@ const validateStudentDetails = (res, details) => {
 			return false
 		}
 	})
-	details.skills.forEach(skill => {
+	skills.forEach(skill => {
 		if(!skill) {
 			res.json({
 				success: false,
