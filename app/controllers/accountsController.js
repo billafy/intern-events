@@ -69,7 +69,7 @@ const createStudentAccount = async (req, res) => {
 		reputationPoints: 0,
 		projects: [],
 		skills: [],
-		resume: '',
+		resume: "",
 	};
 	if (
 		!validateAccountDetails(res, req.body) ||
@@ -87,7 +87,12 @@ const createStudentAccount = async (req, res) => {
 		contactNumber,
 		description,
 		accountType: "student",
-		details: { ...details, dateOfBirth: getFormattedDate(dateOfBirth), projects: [], skills: [] },
+		details: {
+			...details,
+			dateOfBirth: getFormattedDate(dateOfBirth),
+			projects: [],
+			skills: [],
+		},
 	});
 	if (!account) return;
 	const accessToken = generateAccessToken(account);
@@ -172,21 +177,17 @@ const createCompanyAccount = async (req, res) => {
 const login = async (req, res) => {
 	const { email, password } = req.body;
 	if (!email || !password)
-		return res
-			.status(400)
-			.json({
-				success: false,
-				body: { error: "Credentials not provided" },
-			});
+		return res.status(400).json({
+			success: false,
+			body: { error: "Credentials not provided" },
+		});
 
 	const account = await Account.findOne({ email });
 	if (!account)
-		return res
-			.status(400)
-			.json({
-				success: false,
-				body: { error: "Account does not exist" },
-			});
+		return res.status(400).json({
+			success: false,
+			body: { error: "Account does not exist" },
+		});
 
 	if (!(await comparePassword(password, account.password)))
 		return res
@@ -314,12 +315,11 @@ const uploadResume = async (req, res) => {
 	} = req;
 	const account = await Account.findById(_id);
 	if (account.details.resume) deleteResume(account.details.resume);
-	account.details = {...account.details, resume: filename};
-	await account.save()
-	console.log(account)
+	account.details = { ...account.details, resume: filename };
+	await account.save();
 	res.json({
 		success: true,
-		body: { message: "Resume uploaded", resume: filename },
+		body: { message: "Resume uploaded", account },
 	});
 };
 
@@ -328,14 +328,14 @@ const uploadProfilePicture = async (req, res) => {
 		params: { _id },
 		file: { filename },
 	} = req;
-	const account = await Account.findById(_id, ["profilePicture"]);
+	const account = await Account.findById(_id);
 	if (account.profilePicture !== "default.png" && account.profilePicture)
 		deleteProfilePicture(account.profilePicture);
 	account.profilePicture = filename;
-	account.save();
+	await account.save();
 	res.json({
 		success: true,
-		body: { message: "Profile picture uploaded", profilePicture: filename },
+		body: { message: "Profile picture uploaded", account },
 	});
 };
 
