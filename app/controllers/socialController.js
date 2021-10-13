@@ -2,7 +2,7 @@ const {Post} = require('../schema/models')
 const {currentDateTimestamp} = require('../utils/utils')
 
 const getPosts = async (req, res) => {
-	console.log(req.body)
+	console.log(req.account)
 	res.json({success: true})
 }
 
