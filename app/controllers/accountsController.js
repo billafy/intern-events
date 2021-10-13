@@ -4,7 +4,11 @@ const {
 	comparePassword,
 	generateAccessToken,
 } = require("../utils/auth");
-const { currentDateTimestamp, getFormattedDate, idify } = require("../utils/utils");
+const {
+	currentDateTimestamp,
+	getFormattedDate,
+	idify,
+} = require("../utils/utils");
 const {
 	accountExists,
 	validateCompanyDetails,
@@ -89,7 +93,7 @@ const createStudentAccount = async (req, res) => {
 		accountType: "student",
 		details: {
 			...details,
-			dateOfBirth: getFormattedDate(dateOfBirth),
+			dateOfBirth,
 			projects: [],
 			skills: [],
 		},
@@ -143,8 +147,14 @@ const createCollegeAccount = async (req, res) => {
 };
 
 const createCompanyAccount = async (req, res) => {
-	const { email, password, description, contactNumber, name, address } =
-		req.body;
+	const {
+		email,
+		password,
+		description,
+		contactNumber,
+		name,
+		address,
+	} = req.body;
 	const details = { name, address };
 	if (
 		!(await accountExists(res, email)) ||
@@ -269,8 +279,12 @@ const updateAccount = async (req, res) => {
 		return;
 	else if (accountType === "company" && !validateCompanyDetails(res, details))
 		return;
-	if(accountType === 'student') 
-		details = {...details, projects: idify(details.projects), skills: idify(details.skills)}
+	if (accountType === "student")
+		details = {
+			...details,
+			projects: idify(details.projects),
+			skills: idify(details.skills),
+		};
 	const updatedAccount = await Account.findByIdAndUpdate(
 		_id,
 		{ contactNumber, description, details },

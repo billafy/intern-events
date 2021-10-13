@@ -54,6 +54,7 @@ const internshipSchema = new Schema({
 	numberOfPositions: Number,
 	accountId: String,
 	applications: [{
+		_id: String,
 		message: String,
 		dateTime: String,
 		status: String,
@@ -71,17 +72,20 @@ const eventSchema = new Schema({
 	prize: String,
 	accountId: String,
 	participants: [{
+		_id: String,
 		studentId: String,
 	}]
 })
 
 const postSchema = new Schema({
-	caption: String,
 	content: String,
+	media: String,
 	likes: Number,
 	accountId: String,
 	postedBy: String,
+	creationDate: String,
 	comments: [{
+		_id: String,
 		text: String,
 		commentedBy: String,
 		likes: Number,

@@ -11,7 +11,7 @@ const {authenticateToken} = require('./utils/auth')
 
 const accountsRouter = require('./routers/accountsRouter')
 const internEventsRouter = require('./routers/internEventsRouter')
-const socialRouter = require('./routers/socialRouter')
+const socialRouter = require('./
 
 require('dotenv').config()
 
