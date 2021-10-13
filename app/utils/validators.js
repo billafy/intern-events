@@ -143,7 +143,7 @@ const validateStudentDetails = (res, details) => {
 		}
 	})
 	skills.forEach(skill => {
-		if(!skill) {
+		if(!skill.title) {
 			res.json({
 				success: false,
 				body: {

@@ -1,3 +1,5 @@
+const {v4} = require('uuid')
+
 const currentDateTimestamp = () => {
 	const current = new Date();
 
@@ -24,7 +26,17 @@ const getFormattedDate = (ms) => {
 	return `${day}/${month}/${year}`;
 };
 
+const idify = (arr) => {
+	const newArr = arr.map(item => {
+		if(!item._id) 
+			return {_id: v4(), ...item}
+		return item
+	})
+	return newArr
+}
+
 module.exports = {
 	currentDateTimestamp,
 	getFormattedDate,
+	idify,
 };

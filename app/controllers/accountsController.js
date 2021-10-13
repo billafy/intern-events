@@ -4,7 +4,7 @@ const {
 	comparePassword,
 	generateAccessToken,
 } = require("../utils/auth");
-const { currentDateTimestamp, getFormattedDate } = require("../utils/utils");
+const { currentDateTimestamp, getFormattedDate, idify } = require("../utils/utils");
 const {
 	accountExists,
 	validateCompanyDetails,
@@ -256,7 +256,7 @@ const updateAccount = async (req, res) => {
 			success: false,
 			body: { error: "Incomplete information provided" },
 		});
-	const { contactNumber, description, details } = req.body.account;
+	let { contactNumber, description, details } = req.body.account;
 	if (!contactNumber || !details)
 		return res.json({
 			success: false,
@@ -269,6 +269,8 @@ const updateAccount = async (req, res) => {
 		return;
 	else if (accountType === "company" && !validateCompanyDetails(res, details))
 		return;
+	if(accountType === 'student') 
+		details = {...details, projects: idify(details.projects), skills: idify(details.skills)}
 	const updatedAccount = await Account.findByIdAndUpdate(
 		_id,
 		{ contactNumber, description, details },
