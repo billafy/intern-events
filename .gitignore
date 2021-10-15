@@ -1,3 +1,7 @@
 /node_modules
 
 .env
+
+/media/posts/*
+/media/profilePictures/*
+/media/resumes/*
