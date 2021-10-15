@@ -82,7 +82,7 @@ const postSchema = new Schema({
 	media: String,
 	likes: Number,
 	accountId: String,
-	postedBy: String,
+	postedBy: {type: Schema.Types.ObjectId, ref: 'Account'},
 	creationDate: String,
 	comments: [{
 		_id: String,

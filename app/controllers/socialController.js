@@ -1,9 +1,13 @@
-const {Post} = require('../schema/models')
+const {Account, Post} = require('../schema/models')
 const {currentDateTimestamp} = require('../utils/utils')
+const {accountExists} = require('../utils/validators')
 
 const getPosts = async (req, res) => {
-	console.log(req.account)
-	res.json({success: true})
+	const {_id} = req.account
+	const account = await Account.findById(_id, ['following'])
+	const followingIds = [_id, ...(account.following.map(following => following.accountId))]
+	let posts = await Post.find({postedBy: followingIds}).populate('postedBy')
+	res.json({success: true, body: {posts}})
 }
 
 const createPost = async (req, res) => {
