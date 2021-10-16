@@ -80,7 +80,7 @@ const eventSchema = new Schema({
 const postSchema = new Schema({
 	content: String,
 	media: String,
-	likes: Number,
+	likes: [{type: Schema.Types.ObjectId, ref: 'Account'}],
 	accountId: String,
 	postedBy: {type: Schema.Types.ObjectId, ref: 'Account'},
 	creationDate: String,

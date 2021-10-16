@@ -1,4 +1,4 @@
-const {v4} = require('uuid')
+const { v4 } = require("uuid");
 
 const currentDateTimestamp = () => {
 	const current = new Date();
@@ -27,16 +27,37 @@ const getFormattedDate = (ms) => {
 };
 
 const idify = (arr) => {
-	const newArr = arr.map(item => {
-		if(!item._id) 
-			return {_id: v4(), ...item}
-		return item
-	})
-	return newArr
-}
+	const newArr = arr.map((item) => {
+		if (!item._id) return { _id: v4(), ...item };
+		return item;
+	});
+	return newArr;
+};
+
+const timestampSplitter = (timestamp) => {
+	const split = timestamp.split("-");
+	const d = split[0].slice(0, split[0].length - 1),
+		t = split[1].slice(1);
+	const [day, month, year] = d.split("/");
+	const [hours, minutes] = t.split(":");
+	return { day, month, year, hours, minutes };
+};
+
+const sortPosts = (post1, post2) => {
+	const date1 = timestampSplitter(post1.creationDate),
+		date2 = timestampSplitter(post2.creationDate);
+	return date1.year > date2.year ||
+		date1.month > date2.month ||
+		date1.day > date2.day ||
+		date1.hours > date2.hours ||
+		date1.minutes > date2.minutes
+		? -1
+		: 1;
+};
 
 module.exports = {
 	currentDateTimestamp,
 	getFormattedDate,
 	idify,
+	sortPosts,
 };
