@@ -37,13 +37,14 @@ const createPost = async (req, res) => {
 
 const likePost = async (req, res) => {
 	const {params: {postId, _id}} = req;
-	const post = await Post.findById(postId)
+	let post = await Post.findById(postId).populate('postedBy')
 	const likes = post.likes.map(like => like.toString())
-	if(likes.includes(_id))
-		return res.json({success: false, body: {error: 'Post already liked.'}})
-	post.likes.push(_id)
-	post.save()
-	res.json({success: true, body: {message: 'Post liked.'}})
+	if(likes.includes(_id)) 
+		post.likes = post.likes.filter(like => like.toString() !== _id)
+	else 
+		post.likes.push(_id)
+	await post.save()
+	res.json({success: true, body: {post}})
 }
 
 

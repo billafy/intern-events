@@ -311,10 +311,10 @@ const searchAccounts = async (req, res) => {
 			{ "details.name": regexp },
 		],
 	};
-	const accounts = await Account.find(orCondition, {
-		"details.resume": 0,
-		password: 0,
-	});
+	const accounts = await Account.find(orCondition, [
+		"details",
+		"profilePicture",
+	]);
 	res.json({
 		success: true,
 		body: {
