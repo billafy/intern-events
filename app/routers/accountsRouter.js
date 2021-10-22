@@ -32,13 +32,13 @@ router.post("/createCollegeAccount", createCollegeAccount);
 router.post("/createCompanyAccount", createCompanyAccount);
 router.post("/login", login);
 router.post("/refresh", verifyAccessToken, refresh);
-router.post(
+router.put(
 	"/uploadResume/:_id",
 	verifyAccessToken,
 	resumeUpload.single("resume"),
 	uploadResume
 );
-router.post(
+router.put(
 	"/uploadProfilePicture/:_id",
 	verifyAccessToken,
 	profilePictureUpload.single("profilePicture"),

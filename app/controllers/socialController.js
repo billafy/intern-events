@@ -12,6 +12,12 @@ const getTimeline = async (req, res) => {
 	res.json({success: true, body: {posts}})
 }
 
+const getPosts = async (req, res) => {
+	const {_id} = req.params
+	const posts = await Post.find({postedBy: _id})
+	res.json({success: true, body: {posts}})
+}
+
 const createPost = async (req, res) => {
 	const {
 		params: { _id },
@@ -72,8 +78,9 @@ const followAccount = async (req, res) => {
 
 
 module.exports = {
+	getPosts,
 	getTimeline,
 	createPost,
 	likePost,
-	followAccount
+	followAccount,
 }
