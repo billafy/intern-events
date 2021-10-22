@@ -12,6 +12,8 @@ const {
 	updateAccount,
 	uploadResume,
 	uploadProfilePicture,
+	getAccountIds,
+	getAccount,
 } = require("../controllers/accountsController");
 const { verifyAccessToken } = require("../utils/auth");
 const {
@@ -21,6 +23,8 @@ const {
 
 const router = Router();
 
+router.get('/getAccount/:_id', getAccount);
+router.get('/getAccountIds', getAccountIds);
 router.get("/searchAccounts/:keyword", searchAccounts);
 
 router.post("/createStudentAccount", createStudentAccount);

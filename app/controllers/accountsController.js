@@ -184,6 +184,14 @@ const createCompanyAccount = async (req, res) => {
 	});
 };
 
+const getAccount = async (req, res) => {
+	const {_id} = req.params
+	const account = await Account.findById(_id)
+	if(!account) 
+		return res.json({success: false, body: {error: 'Account does not exists.'}})
+	res.json({success: true, body: {account}})
+}
+
 const login = async (req, res) => {
 	const { email, password } = req.body;
 	if (!email || !password)
@@ -298,11 +306,6 @@ const updateAccount = async (req, res) => {
 
 const searchAccounts = async (req, res) => {
 	const { keyword } = req.params;
-	if (keyword.length < 3)
-		return res.json({
-			success: false,
-			body: { message: "Keyword too short" },
-		});
 	const regexp = { $regex: `${keyword}.*`, $options: "i" };
 	const orCondition = {
 		$or: [
@@ -323,6 +326,11 @@ const searchAccounts = async (req, res) => {
 		},
 	});
 };
+
+const getAccountIds = async (req, res) => {
+	const _ids = await Account.find({}, ['_id'])
+	res.json({success: true, body: {_ids}})
+}
 
 const uploadResume = async (req, res) => {
 	const {
@@ -368,4 +376,6 @@ module.exports = {
 	updateAccount,
 	uploadResume,
 	uploadProfilePicture,
+	getAccountIds,
+	getAccount,
 };

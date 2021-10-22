@@ -36,8 +36,11 @@ const createPost = async (req, res) => {
 }
 
 const likePost = async (req, res) => {
-	const {params: {postId, _id}} = req;
+	const {params: {postId}} = req;
+	const _id = req.account._id.toString()
 	let post = await Post.findById(postId).populate('postedBy')
+	if(!post) 
+		return res.json({success: false, body: {error: 'Post does not exists.'}})
 	const likes = post.likes.map(like => like.toString())
 	if(likes.includes(_id)) 
 		post.likes = post.likes.filter(like => like.toString() !== _id)
@@ -47,9 +50,30 @@ const likePost = async (req, res) => {
 	res.json({success: true, body: {post}})
 }
 
+const followAccount = async (req, res) => {
+	const {params: {accountId}} = req;
+	const _id = req.account._id.toString()
+	const followingAccount = await Account.findById(accountId)
+	if(!followingAccount) 
+		return res.json({success: false, body: {error: 'Account does not exists.'}})
+	let account = await Account.findById(_id);
+	if(account.following.includes(accountId)) {
+		followingAccount.followers = followingAccount.followers.filter(follower => follower !== _id)
+		account.following = account.following.filter(following => following !== accountId);
+	}
+	else {
+		followingAccount.followers.push(_id)
+		account.following.push(accountId)
+	}
+	await followingAccount.save()
+	await account.save()
+	res.json({success: true, body: {account, followingAccount}})
+}
+
 
 module.exports = {
 	getTimeline,
 	createPost,
 	likePost,
+	followAccount
 }

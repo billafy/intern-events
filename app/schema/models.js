@@ -6,12 +6,8 @@ const accountSchema = new Schema({
 	accountType: String,
 	contactNumber: Number,
 	description: String,
-	followers: [{
-		accountId: String,
-	}],
-	following: [{
-		accountId: String,
-	}],
+	followers: [String],
+	following: [String],
 	creationDate: String,
 	profilePicture: String,
 	details: Object,
