@@ -83,7 +83,7 @@ const postSchema = new Schema({
 	comments: [{
 		_id: String,
 		text: String,
-		commentedBy: String,
+		commentedBy: {type: Schema.Types.ObjectId, ref: 'Account'},
 		likes: Number,
 	}]
 })

@@ -5,6 +5,7 @@ const {
 	likePost,
 	followAccount,
 	getPosts,
+	commentPost,
 } = require("../controllers/socialController");
 const { verifyAccessToken } = require("../utils/auth");
 const { postUpload } = require("../utils/staticStorage");
@@ -21,5 +22,6 @@ router.post(
 );
 router.put("/likePost/:postId", verifyAccessToken, likePost);
 router.put("/followAccount/:accountId", verifyAccessToken, followAccount);
+router.put("/commentPost/:postId", verifyAccessToken, commentPost);
 
 module.exports = router;
