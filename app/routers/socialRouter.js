@@ -6,6 +6,8 @@ const {
 	followAccount,
 	getPosts,
 	commentPost,
+	deleteComment,
+	deletePost,
 } = require("../controllers/socialController");
 const { verifyAccessToken } = require("../utils/auth");
 const { postUpload } = require("../utils/staticStorage");
@@ -23,5 +25,8 @@ router.post(
 router.put("/likePost/:postId", verifyAccessToken, likePost);
 router.put("/followAccount/:accountId", verifyAccessToken, followAccount);
 router.put("/commentPost/:postId", verifyAccessToken, commentPost);
+
+router.delete('/deleteComment/:postId/:commentId', verifyAccessToken, deleteComment)
+router.delete('/deletePost/:postId', verifyAccessToken, deletePost)
 
 module.exports = router;

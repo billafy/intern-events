@@ -62,6 +62,18 @@ const createPost = async (req, res) => {
 	res.json({ success: true, post });
 };
 
+const deletePost = async (req, res) => {
+	const {params: {postId}} = req;
+	const _id = req.account._id.toString()
+	const post = await Post.findById(postId).populate('postedBy')
+	if(!post) 
+		return res.json({success: false, body: {error: 'Post does not exists.'}})
+	if(_id !== post.postedBy._id.toString()) 
+		return res.json({success: false, body: {error: 'Not authorized to delete this post.'}})
+	await Post.findByIdAndDelete(postId)
+	res.json({success: true})
+}
+
 const likePost = async (req, res) => {
 	const {
 		params: { postId },
@@ -87,7 +99,7 @@ const commentPost = async (req, res) => {
 		body: { text },
 	} = req;
 	const _id = req.account._id.toString();
-	let post = await Post.findById(postId);
+	let post = await Post.findById(postId).populate('postedBy').populate(commentPopulate);
 	if (!post)
 		return res.json({
 			success: false,
@@ -106,6 +118,24 @@ const commentPost = async (req, res) => {
 	post = await Post.findById(postId).populate('postedBy').populate(commentPopulate)
 	res.json({ success: true, body: { post } });
 };
+
+const deleteComment = async (req, res) => {
+	const {params: {postId, commentId}} = req
+	const _id = req.account._id.toString();
+	let post = await Post.findById(postId).populate('postedBy').populate(commentPopulate);
+	if(!post) 
+		return res.json({
+			success: false,
+			body: { error: "Post does not exists." },
+		});
+	post.comments = post.comments.filter(comment => {
+		if(_id === comment.commentedBy._id.toString() && commentId === comment._id) 
+			return false;
+		return true;
+	})
+	await post.save();
+	res.json({success: true, body: {post}})
+}
 
 const followAccount = async (req, res) => {
 	const {
@@ -142,4 +172,6 @@ module.exports = {
 	likePost,
 	followAccount,
 	commentPost,
+	deleteComment,
+	deletePost,
 };
