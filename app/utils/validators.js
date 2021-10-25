@@ -130,30 +130,30 @@ const validateStudentDetails = (res, details) => {
 		});
 		return false;
 	}
-	projects.forEach(project => {
-		if(!project.title || !project.link) {
+	projects.forEach((project) => {
+		if (!project.title || !project.link) {
 			res.json({
 				success: false,
 				body: {
 					errorType: "InformationError",
 					error: "Invalid project list",
-				}
-			})
-			return false
+				},
+			});
+			return false;
 		}
-	})
-	skills.forEach(skill => {
-		if(!skill.title) {
+	});
+	skills.forEach((skill) => {
+		if (!skill.title) {
 			res.json({
 				success: false,
 				body: {
 					errorType: "InformationError",
 					error: "Invalid skill list",
-				}
-			})
-			return false
+				},
+			});
+			return false;
 		}
-	})
+	});
 	return true;
 };
 
@@ -189,6 +189,33 @@ const validateCompanyDetails = (res, details) => {
 	return true;
 };
 
+const validateInternshipInput = (res, input) => {
+	let error = '';
+	if (
+		!input.title ||
+		!input.description ||
+		!input.stipend ||
+		!input.duration ||
+		!input.numberOfPositions ||
+		!input.category ||
+		!input.applicationEnd
+	) 
+		error = 'Incomplete information provided'
+	else if(isNaN(input.stipend) || input.stipend < 0) 
+		error = 'Invalid stipend'
+	else if(isNaN(input.duration) || input.duration <= 0) 
+		error = 'Invalid duration'
+	else if(isNaN(input.numberOfPositions) || parseInt(input.numberOfPositions) <= 0) 
+		error = 'Invalid number of positions'
+	else if(!getFormattedDate(input.applicationEnd) && getFormattedDate(input.applicationEnd) > getFormattedDate(new Date())) 
+		error = 'Invalid application end date'
+	if(error) {
+		res.json({success: false, body: {error}})
+		return false;
+	}
+	return true;
+};
+
 module.exports = {
 	accountExists,
 	validateCompanyDetails,
@@ -198,4 +225,5 @@ module.exports = {
 	validateContactNumber,
 	validateStudentDetails,
 	validateEmail,
+	validateInternshipInput,
 };

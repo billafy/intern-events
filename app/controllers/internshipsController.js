@@ -1,36 +1,33 @@
-const {
-	Internship,
-	Event
-} = require('../schema/models');
+const {Internship} = require('../schema/models');
+const {validateInternshipInput} = require('../utils/validators')
+const {getFormattedDate, currentDateTimestamp} = require('../utils/utils')
 
 const getInternships = async (req, res) => {
 	const internships = await Internship.find(req.query)
 	res.json({success: true, body: {internships}})
 }
 
-const createInternship = (req, res) => {
-	const {
-		title,
-		description,
-		stipend,
-		duration,
-		applicationStart,
-		applicationEnd,
-		category,
-		numberOfPositions,
-	} = req.body
+const createInternship = async (req, res) => {
+	const input = req.body.internshipInput
+	if(req.account.accountType !== 'company') 
+		return res.json({success: false, body: {error: 'Unauthorized account type.'}})
+
+	if(!validateInternshipInput(res, input)) 
+		return;
 
 	const internship = new Internship({
-		title,
-		description,
-		stipend,
-		duration,
-		applicationStart,
-		applicationEnd,
-		category,
-		numberOfPositions,
+		title: input.title,
+		description: input.description,
+		stipend: input.stipend,
+		duration: input.duration,
+		applicationStart: getFormattedDate(new Date()),
+		applicationEnd: getFormattedDate(input.applicationEnd),
+		category: input.category,
+		numberOfPositions: input.numberOfPositions,
 		applications: [],
-	}).save()
+		companyId: req.account._id,
+	})
+	await internship.save()
 	res.json({success: true, body: {internship}})
 }
 

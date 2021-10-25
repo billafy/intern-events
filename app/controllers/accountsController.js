@@ -186,7 +186,7 @@ const createCompanyAccount = async (req, res) => {
 
 const getAccount = async (req, res) => {
 	const {_id} = req.params
-	const account = await Account.findById(_id)
+	const account = await Account.findById(_id);
 	if(!account) 
 		return res.json({success: false, body: {error: 'Account does not exists.'}})
 	res.json({success: true, body: {account}})
@@ -222,7 +222,7 @@ const login = async (req, res) => {
 };
 
 const refresh = async (req, res) => {
-	const account = await Account.findById(req.account._id, { password: 0 });
+	const account = await Account.findById(req.account._id);
 	res.json({
 		success: true,
 		body: { message: "Token was verified", account },

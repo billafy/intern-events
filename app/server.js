@@ -10,7 +10,7 @@ const socketConnection = require("./socket/socketConnection");
 const { authenticateToken } = require("./utils/auth");
 
 const accountsRouter = require("./routers/accountsRouter");
-const internEventsRouter = require("./routers/internEventsRouter");
+const internshipsRouter = require("./routers/internshipsRouter");
 const socialRouter = require("./routers/socialRouter");
 
 require("dotenv").config();
@@ -52,7 +52,7 @@ mongoose.connection.on("open", () => {
 /* api */
 
 app.use("/accounts", accountsRouter);
-app.use("/internEvents", internEventsRouter);
+app.use("/internships", internshipsRouter);
 app.use("/social", socialRouter);
 
 /* making the app listen to a port */

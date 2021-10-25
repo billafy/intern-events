@@ -1,11 +1,12 @@
 const { Router } = require("express");
-const {getInternships} = require("../controllers/internEventsController");
+const {getInternships, createInternship} = require("../controllers/internshipsController");
+const {verifyAccessToken} = require('../utils/auth')
 
 const router = Router();
 
 router.get("/getInternships", getInternships);
 
-router.post("/createInternship");
+router.post("/createInternship", verifyAccessToken, createInternship);
 router.post("/createEvent");
 
 router.put("/updateInternship");

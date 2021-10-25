@@ -43,18 +43,18 @@ const internshipSchema = new Schema({
 	title: String,
 	description: String,
 	stipend: Number,
-	duration: String,
+	duration: Number,
 	applicationStart: String,
 	applicationEnd: String,
 	category: String,
 	numberOfPositions: Number,
-	accountId: String,
+	companyId: {type: Schema.Types.ObjectId, ref: 'Account'},
 	applications: [{
 		_id: String,
 		message: String,
 		dateTime: String,
 		status: String,
-		studentId: String
+		studentId: {type: Schema.Types.ObjectId, ref: 'Account'},
 	}]
 })
 
@@ -66,10 +66,10 @@ const eventSchema = new Schema({
 	status: String,
 	fee: Number,
 	prize: String,
-	accountId: String,
+	collegeId: {type: Schema.Types.ObjectId, ref: 'Account'},
 	participants: [{
 		_id: String,
-		studentId: String,
+		studentId: {type: Schema.Types.ObjectId, ref: 'Account'},
 	}]
 })
 
