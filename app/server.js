@@ -22,6 +22,9 @@ const port = process.env.PORT || 5000;
 
 /* middlewares */
 
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.static("media"));
 app.use(
 	cors({
 		origin: [
@@ -34,9 +37,6 @@ app.use(
 		secure: true,
 	})
 );
-app.use(express.json());
-app.use(cookieParser());
-app.use(express.static("media"));
 
 /* mongodb database connection */
 

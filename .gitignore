@@ -3,5 +3,5 @@
 .env
 
 /media/posts/*
-# /media/profilePictures/*
+/media/profilePictures/*
 /media/resumes/*
