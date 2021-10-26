@@ -24,7 +24,11 @@ const port = process.env.PORT || 5000;
 
 app.use(
 	cors({
-		origin: ["https://restify.vercel.app", "http://localhost:3000"],
+		origin: [
+			"https://restify.vercel.app",
+			"http://localhost:3000",
+			"https://internly.vercel.app",
+		],
 		credentials: true,
 		sameSite: "None",
 		secure: true,
