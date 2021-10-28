@@ -1,5 +1,5 @@
 const { Account, Post, Message } = require("../schema/models");
-const { sortPosts, currentDateTimestamp } = require("../utils/utils");
+const { sortPosts, currentDateTimestamp, sortChats } = require("../utils/utils");
 const { accountExists } = require("../utils/validators");
 const { idify } = require("../utils/utils");
 
@@ -203,12 +203,13 @@ const getChats = async (req, res) => {
 		}
 	})
 	chats = Object.values(chats).map(chat => {
-		const newChat = chat.map(message => ({_id: message._id, text: message.text, from: message.from._id, to: message.to._id}))
+		const newChat = chat.map(message => ({_id: message._id, text: message.text, from: message.from._id, to: message.to._id, dateTime: message.dateTime}))
 		if(chat[0].from._id.toString() === _id) 
 			return {account: chat[0].to, chat: newChat} 
 		else 
 			return {account: chat[0].from, chat: newChat}
 	})
+	chats.sort(sortChats);
 	res.json({ success: true, body: { chats } });
 };
 
