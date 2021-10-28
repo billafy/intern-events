@@ -19,6 +19,16 @@ const comparePassword = async (password, hashedPassword) => {
 
 /* access token */
 
+const getAccountId = async (accessToken) => {
+	try {
+		const account = jwt.verify(accessToken, ACCESS_TOKEN_SECRET)
+		return account._id;
+	}
+	catch {
+		return false;
+	}
+}
+
 const generateAccessToken = (account) => {
 	return jwt.sign(
 		{
@@ -56,4 +66,5 @@ module.exports = {
 	comparePassword,
 	generateAccessToken,
 	verifyAccessToken,
+	getAccountId,
 };

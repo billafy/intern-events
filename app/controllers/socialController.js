@@ -1,17 +1,14 @@
-const { Account, Post } = require("../schema/models");
+const { Account, Post, Message } = require("../schema/models");
 const { sortPosts, currentDateTimestamp } = require("../utils/utils");
 const { accountExists } = require("../utils/validators");
-const {
-	Types: { ObjectId },
-} = require("mongoose");
 const { idify } = require("../utils/utils");
 
 const commentPopulate = {
-	path: 'comments',
+	path: "comments",
 	populate: {
-		path: 'commentedBy',
-	}
-}
+		path: "commentedBy",
+	},
+};
 
 const getTimeline = async (req, res) => {
 	const { _id } = req.account;
@@ -21,16 +18,18 @@ const getTimeline = async (req, res) => {
 		...account.following.map((following) => following),
 	];
 	console.log(followingIds);
-	let posts = await Post.find({ postedBy: followingIds }).populate(
-		"postedBy"
-	).populate(commentPopulate);
+	let posts = await Post.find({ postedBy: followingIds })
+		.populate("postedBy")
+		.populate(commentPopulate);
 	posts.sort(sortPosts);
 	res.json({ success: true, body: { posts } });
 };
 
 const getPosts = async (req, res) => {
 	const { _id } = req.params;
-	const posts = await Post.find({ postedBy: _id }).populate("postedBy").populate(commentPopulate);
+	const posts = await Post.find({ postedBy: _id })
+		.populate("postedBy")
+		.populate(commentPopulate);
 	posts.sort(sortPosts);
 	res.json({ success: true, body: { posts } });
 };
@@ -63,23 +62,33 @@ const createPost = async (req, res) => {
 };
 
 const deletePost = async (req, res) => {
-	const {params: {postId}} = req;
-	const _id = req.account._id.toString()
-	const post = await Post.findById(postId).populate('postedBy')
-	if(!post) 
-		return res.json({success: false, body: {error: 'Post does not exists.'}})
-	if(_id !== post.postedBy._id.toString()) 
-		return res.json({success: false, body: {error: 'Not authorized to delete this post.'}})
-	await Post.findByIdAndDelete(postId)
-	res.json({success: true})
-}
+	const {
+		params: { postId },
+	} = req;
+	const _id = req.account._id.toString();
+	const post = await Post.findById(postId).populate("postedBy");
+	if (!post)
+		return res.json({
+			success: false,
+			body: { error: "Post does not exists." },
+		});
+	if (_id !== post.postedBy._id.toString())
+		return res.json({
+			success: false,
+			body: { error: "Not authorized to delete this post." },
+		});
+	await Post.findByIdAndDelete(postId);
+	res.json({ success: true });
+};
 
 const likePost = async (req, res) => {
 	const {
 		params: { postId },
 	} = req;
 	const _id = req.account._id.toString();
-	let post = await Post.findById(postId).populate("postedBy").populate(commentPopulate);
+	let post = await Post.findById(postId)
+		.populate("postedBy")
+		.populate(commentPopulate);
 	if (!post)
 		return res.json({
 			success: false,
@@ -99,7 +108,9 @@ const commentPost = async (req, res) => {
 		body: { text },
 	} = req;
 	const _id = req.account._id.toString();
-	let post = await Post.findById(postId).populate('postedBy').populate(commentPopulate);
+	let post = await Post.findById(postId)
+		.populate("postedBy")
+		.populate(commentPopulate);
 	if (!post)
 		return res.json({
 			success: false,
@@ -115,27 +126,36 @@ const commentPost = async (req, res) => {
 		{ text, commentedBy: _id, likes: 0 },
 	]);
 	await post.save();
-	post = await Post.findById(postId).populate('postedBy').populate(commentPopulate)
+	post = await Post.findById(postId)
+		.populate("postedBy")
+		.populate(commentPopulate);
 	res.json({ success: true, body: { post } });
 };
 
 const deleteComment = async (req, res) => {
-	const {params: {postId, commentId}} = req
+	const {
+		params: { postId, commentId },
+	} = req;
 	const _id = req.account._id.toString();
-	let post = await Post.findById(postId).populate('postedBy').populate(commentPopulate);
-	if(!post) 
+	let post = await Post.findById(postId)
+		.populate("postedBy")
+		.populate(commentPopulate);
+	if (!post)
 		return res.json({
 			success: false,
 			body: { error: "Post does not exists." },
 		});
-	post.comments = post.comments.filter(comment => {
-		if(_id === comment.commentedBy._id.toString() && commentId === comment._id) 
+	post.comments = post.comments.filter((comment) => {
+		if (
+			_id === comment.commentedBy._id.toString() &&
+			commentId === comment._id
+		)
 			return false;
 		return true;
-	})
+	});
 	await post.save();
-	res.json({success: true, body: {post}})
-}
+	res.json({ success: true, body: { post } });
+};
 
 const followAccount = async (req, res) => {
 	const {
@@ -165,6 +185,33 @@ const followAccount = async (req, res) => {
 	res.json({ success: true, body: { account, followingAccount } });
 };
 
+const getChats = async (req, res) => {
+	const _id = req.account._id;
+	const messages = await Message.find({ $or: [{ from: _id }, { to: _id }] }).populate('from').populate('to');
+	let chats = {}
+	messages.forEach(message => {
+		const to = message.to._id.toString(), from = message.from._id.toString();
+		if(to === _id) {
+			if(!chats[from]) 
+				chats[from] = [];
+			chats[from].push(message);
+		}
+		else {
+			if(!chats[to]) 
+				chats[to] = [];
+			chats[to].push(message);
+		}
+	})
+	chats = Object.values(chats).map(chat => {
+		const newChat = chat.map(message => ({_id: message._id, text: message.text, from: message.from._id, to: message.to._id}))
+		if(chat[0].from._id.toString() === _id) 
+			return {account: chat[0].to, chat: newChat} 
+		else 
+			return {account: chat[0].from, chat: newChat}
+	})
+	res.json({ success: true, body: { chats } });
+};
+
 module.exports = {
 	getPosts,
 	getTimeline,
@@ -174,4 +221,5 @@ module.exports = {
 	commentPost,
 	deleteComment,
 	deletePost,
+	getChats,
 };

@@ -13,7 +13,7 @@ const accountSchema = new Schema({
 	details: Object,
 })
 
-const studentSchema = new Schema({
+/* const studentSchema = new Schema({
 	firstName: String,
 	lastName: String,
 	dateOfBirth: String,
@@ -37,7 +37,7 @@ const companySchema = new Schema({
 	name: String,
 	address: String,
 	accountId: String,
-})
+}) */
 
 const internshipSchema = new Schema({
 	title: String,
@@ -91,8 +91,8 @@ const postSchema = new Schema({
 const messageSchema = new Schema({
 	text: String,
 	dateTime: String,
-	from: String,
-	to: String
+	from: {type: Schema.Types.ObjectId, ref: 'Account'},
+	to: {type: Schema.Types.ObjectId, ref: 'Account'}
 })
 
 module.exports = {
@@ -102,3 +102,9 @@ module.exports = {
 	Post: model('Post', postSchema),
 	Message: model('Message', messageSchema),
 }
+
+/*
+61011d8e34d83312500955b7
+6167149f5a7470185887be24
+616d21425e99a0425067b3ca
+*/

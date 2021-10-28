@@ -8,6 +8,7 @@ const {
 	commentPost,
 	deleteComment,
 	deletePost,
+	getChats,
 } = require("../controllers/socialController");
 const { verifyAccessToken } = require("../utils/auth");
 const { postUpload } = require("../utils/staticStorage");
@@ -16,6 +17,8 @@ const router = Router();
 
 router.get("/getPosts/:_id", getPosts);
 router.get("/getTimeline/:_id", verifyAccessToken, getTimeline);
+router.get('/getChats/:_id', verifyAccessToken, getChats);
+
 router.post(
 	"/createPost/:_id",
 	verifyAccessToken,

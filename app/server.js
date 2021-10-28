@@ -67,7 +67,7 @@ const server = app.listen(port, () => {
 
 /* socket */
 
-const io = socketIo(server);
+const io = socketIo(server, {cors: {origin: 'http://localhost:3000', credentials: true}});
 io.on("connection", socketConnection);
 
 module.exports = app;
