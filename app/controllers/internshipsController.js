@@ -3,9 +3,7 @@ const { validateInternshipInput } = require("../utils/validators");
 const { getFormattedDate, currentDateTimestamp } = require("../utils/utils");
 
 const getInternships = async (req, res) => {
-	let internships = await Internship.find(req.query);
-	internships["numberOfApplications"] = internships.applications.length;
-	delete internships.applications;
+	const internships = await Internship.find(req.query || {}).populate('companyId');
 	res.json({ success: true, body: { internships } });
 };
 
