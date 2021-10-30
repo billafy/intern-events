@@ -4,22 +4,36 @@ const { getFormattedDate, currentDateTimestamp } = require("../utils/utils");
 const { v4 } = require("uuid");
 
 const getInternship = async (req, res) => {
-	const {internshipId} = req.params
+	const { internshipId } = req.params;
 	try {
-		const internship = await Internship.findById(internshipId);
-		if(!internship) 
-			throw 'Internship does not exist'.
-		res.json({success: true, body: {internship}})
+		const internship = await Internship.findById(internshipId).populate(
+			"companyId"
+		);
+		if (!internship)
+			throw "Internship does not exist.";
+		res.json({ success: true, body: { internship } });
+	} catch (error) {
+		res.json({ success: false, body: { error: error.message || error } });
 	}
-	catch(error) {
-		res.json({success: false, body: {error: error.message || error}})
-	}
-}
+};
 
 const getInternships = async (req, res) => {
-	const internships = await Internship.find(req.query || {}).populate(
-		"companyId"
-	);
+	let internships;
+	if(req.query === {})
+		internships = await Internship.find().populate("companyId");
+	else {
+		const query = {}
+		const {category, stipend, duration, keyword} = req.query;
+		if(category) 
+			query.category = category;
+		if(stipend) 
+			query.stipend = {$gte: Number(stipend)};
+		if(duration) 
+			query.duration = {$gt: Number(duration)};
+		if(keyword) 
+			query.title = { $regex: `${keyword}.*`, $options: "i" }
+		internships = await Internship.find({...query}).populate('companyId');
+	}
 	res.json({ success: true, body: { internships } });
 };
 
@@ -67,10 +81,9 @@ const createInternship = async (req, res) => {
 const applyInternship = async (req, res) => {
 	const { internshipId, _id } = req.params;
 	const { message } = req.body;
-	const {accountType} = req.account;
+	const { accountType } = req.account;
 	try {
-		if(accountType !== 'student') 
-			throw 'Invalid account type.'
+		if (accountType !== "student") throw "Invalid account type.";
 		let internship = await Internship.findById(internshipId);
 		if (!internship) throw "Internship does not exist.";
 		const applied = internship.applications.find(
@@ -85,6 +98,7 @@ const applyInternship = async (req, res) => {
 			studentId: _id,
 		});
 		await internship.save();
+		internship = await Internship.findById(internshipId).populate("companyId");
 		res.json({ success: true, body: { internship } });
 	} catch (error) {
 		return res.json({
@@ -95,26 +109,28 @@ const applyInternship = async (req, res) => {
 };
 
 const rejectApplication = async (req, res) => {
-	const {_id, internshipId, applicationId} = req.params;
+	const { _id, internshipId, applicationId } = req.params;
 	try {
-		let internship = await Internship.findById(internshipId).populate({
-			path: "applications",
-			populate: {
-				path: "studentId",
-			},
-		});;
-		if(!internship) 
-			throw "Internship does not exist.";
-		if(_id !== internship.companyId.toString()) 
-			throw 'Not allowed to reject';
-		internship.applications = internship.applications.filter(application => application._id.toString() !== applicationId);
+		let internship = await Internship.findById(internshipId)
+			.populate("companyId")
+			.populate({
+				path: "applications",
+				populate: {
+					path: "studentId",
+				},
+			});
+		if (!internship) throw "Internship does not exist.";
+		if (_id !== internship.companyId.toString())
+			throw "Not allowed to reject";
+		internship.applications = internship.applications.filter(
+			(application) => application._id.toString() !== applicationId
+		);
 		await internship.save();
-		res.json({success: true, body: {internship}});
+		res.json({ success: true, body: { internship } });
+	} catch (error) {
+		res.json({ success: false, body: { error: error.message || error } });
 	}
-	catch(error) {
-		res.json({success: false, body: {error: error.message || error}})
-	}
-}
+};
 
 module.exports = {
 	getInternship,
