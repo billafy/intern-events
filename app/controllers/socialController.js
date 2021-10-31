@@ -17,7 +17,6 @@ const getTimeline = async (req, res) => {
 		_id,
 		...account.following.map((following) => following),
 	];
-	console.log(followingIds);
 	let posts = await Post.find({ postedBy: followingIds })
 		.populate("postedBy")
 		.populate(commentPopulate);

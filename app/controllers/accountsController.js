@@ -213,7 +213,7 @@ const login = async (req, res) => {
 			.json({ success: false, body: { error: "Incorrect password" } });
 
 	const accessToken = generateAccessToken(account);
-	res.cookie("accessToken", accessToken);
+	res.cookie("accessToken", accessToken, {sameSite: 'None', secure: true});
 
 	res.json({
 		success: true,

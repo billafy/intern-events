@@ -9,8 +9,7 @@ const getInternship = async (req, res) => {
 		const internship = await Internship.findById(internshipId).populate(
 			"companyId"
 		);
-		if (!internship)
-			throw "Internship does not exist.";
+		if (!internship) throw "Internship does not exist.";
 		res.json({ success: true, body: { internship } });
 	} catch (error) {
 		res.json({ success: false, body: { error: error.message || error } });
@@ -19,23 +18,34 @@ const getInternship = async (req, res) => {
 
 const getInternships = async (req, res) => {
 	let internships;
-	if(req.query === {})
+	if (req.query === {})
 		internships = await Internship.find().populate("companyId");
 	else {
-		const query = {}
-		const {category, stipend, duration, keyword} = req.query;
-		if(category) 
-			query.category = category;
-		if(stipend) 
-			query.stipend = {$gte: Number(stipend)};
-		if(duration) 
-			query.duration = {$gt: Number(duration)};
-		if(keyword) 
-			query.title = { $regex: `${keyword}.*`, $options: "i" }
-		internships = await Internship.find({...query}).populate('companyId');
+		const query = {};
+		const { category, stipend, duration, keyword } = req.query;
+		if (category && category !== "All") query.category = category;
+		if (stipend) query.stipend = { $gte: Number(stipend) };
+		if (duration) query.duration = { $gte: Number(duration) };
+		if (keyword) query.title = { $regex: `${keyword}.*`, $options: "i" };
+		internships = await Internship.find({ ...query }).populate("companyId");
 	}
 	res.json({ success: true, body: { internships } });
 };
+
+const myAppliedInternships = async (req, res) => {
+	const {_id} = req.params;
+	const internships = await Internship.find({}).populate("companyId");
+	let newInternships = await internships.map(internship => {
+		const application = internship.applications.find(application => application.studentId.toString() === _id)
+		if(!application) 
+			return null;
+		const newInternship = internship._doc;
+		delete newInternship.applications;
+		return {...newInternship, application};
+	})
+	newInternships = newInternships.filter(internship => internship);
+	res.json({success: true, body: {internships: newInternships}});
+}
 
 const getCompanyInternships = async (req, res) => {
 	const companyId = req.account._id;
@@ -98,7 +108,9 @@ const applyInternship = async (req, res) => {
 			studentId: _id,
 		});
 		await internship.save();
-		internship = await Internship.findById(internshipId).populate("companyId");
+		internship = await Internship.findById(internshipId).populate(
+			"companyId"
+		);
 		res.json({ success: true, body: { internship } });
 	} catch (error) {
 		return res.json({
@@ -108,24 +120,31 @@ const applyInternship = async (req, res) => {
 	}
 };
 
-const rejectApplication = async (req, res) => {
+const updateApplicationStatus = async (req, res) => {
 	const { _id, internshipId, applicationId } = req.params;
+	const { status } = req.body;
 	try {
+		if (status !== "Rejected" && status !== "In Touch")
+			throw "Invalid application status";
 		let internship = await Internship.findById(internshipId)
-			.populate("companyId")
+		if (!internship) throw "Internship does not exist.";
+		if (_id !== internship.companyId.toString())
+			throw "Not allowed to update.";
+		const newApplications = internship.applications.map(application => {
+			if(String(application._id) == applicationId) {
+				let newApplication = application;
+				newApplication.status = status;
+				return newApplication;
+			}
+			return application;
+		})
+		internship = await Internship.findByIdAndUpdate(internshipId, {applications: newApplications}, {new: true}).populate("companyId")
 			.populate({
 				path: "applications",
 				populate: {
 					path: "studentId",
 				},
 			});
-		if (!internship) throw "Internship does not exist.";
-		if (_id !== internship.companyId.toString())
-			throw "Not allowed to reject";
-		internship.applications = internship.applications.filter(
-			(application) => application._id.toString() !== applicationId
-		);
-		await internship.save();
 		res.json({ success: true, body: { internship } });
 	} catch (error) {
 		res.json({ success: false, body: { error: error.message || error } });
@@ -138,5 +157,6 @@ module.exports = {
 	getCompanyInternships,
 	createInternship,
 	applyInternship,
-	rejectApplication,
+	updateApplicationStatus,
+	myAppliedInternships,
 };
