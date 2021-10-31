@@ -67,7 +67,14 @@ const server = app.listen(port, () => {
 
 /* socket */
 
-const io = socketIo(server, {cors: {origin: 'http://localhost:3000', credentials: true, sameSite: 'None', secure: true}});
+const io = socketIo(server, {
+	cors: {
+		origin: ["http://localhost:3000", 'https://internly.vercel.app'],
+		credentials: true,
+		sameSite: "None",
+		secure: true,
+	},
+});
 io.on("connection", socketConnection);
 
 module.exports = app;
