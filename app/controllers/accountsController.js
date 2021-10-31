@@ -100,7 +100,7 @@ const createStudentAccount = async (req, res) => {
 	});
 	if (!account) return;
 	const accessToken = generateAccessToken(account);
-	res.cookie("accessToken", accessToken);
+	res.cookie("accessToken", accessToken, {sameSite: 'None', secure: true});
 	res.status(201).json({
 		success: true,
 		body: { message: "Account created successfully", account },
@@ -139,7 +139,7 @@ const createCollegeAccount = async (req, res) => {
 	if (!account) return;
 
 	const accessToken = generateAccessToken(account);
-	res.cookie("accessToken", accessToken);
+	res.cookie("accessToken", accessToken, {sameSite: 'None', secure: true});
 	res.status(201).json({
 		success: true,
 		body: { message: "Account created successfully", account },
@@ -177,7 +177,7 @@ const createCompanyAccount = async (req, res) => {
 	if (!account) return;
 
 	const accessToken = generateAccessToken(account);
-	res.cookie("accessToken", accessToken);
+	res.cookie("accessToken", accessToken, {sameSite: 'None', secure: true});
 	res.status(201).json({
 		success: true,
 		body: { message: "Account created successfully", account },
