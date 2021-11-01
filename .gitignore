@@ -5,3 +5,7 @@
 /media/posts/*
 /media/profilePictures/*
 /media/resumes/*
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
