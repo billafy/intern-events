@@ -11,25 +11,30 @@ const {
 	getChats,
 } = require("../controllers/socialController");
 const { verifyAccessToken } = require("../utils/auth");
-const { postUpload } = require("../utils/staticStorage");
+const { storageUpload } = require("../utils/mediaStorage");
 
 const router = Router();
 
 router.get("/getPosts/:_id", getPosts);
 router.get("/getTimeline/:_id", verifyAccessToken, getTimeline);
-router.get('/getChats/:_id', verifyAccessToken, getChats);
+router.get("/getChats/:_id", verifyAccessToken, getChats);
 
 router.post(
 	"/createPost/:_id",
 	verifyAccessToken,
-	postUpload.single("post"),
+	storageUpload.single("post"),
 	createPost
 );
+
 router.put("/likePost/:postId", verifyAccessToken, likePost);
 router.put("/followAccount/:accountId", verifyAccessToken, followAccount);
 router.put("/commentPost/:postId", verifyAccessToken, commentPost);
 
-router.delete('/deleteComment/:postId/:commentId', verifyAccessToken, deleteComment)
-router.delete('/deletePost/:postId', verifyAccessToken, deletePost)
+router.delete(
+	"/deleteComment/:postId/:commentId",
+	verifyAccessToken,
+	deleteComment
+);
+router.delete("/deletePost/:postId", verifyAccessToken, deletePost);
 
 module.exports = router;

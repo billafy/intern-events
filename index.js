@@ -6,12 +6,12 @@ const cors = require("cors");
 const socketIo = require("socket.io");
 const cookieParser = require("cookie-parser");
 
-const socketConnection = require("./socket/socketConnection");
-const { authenticateToken } = require("./utils/auth");
+const socketConnection = require("./app/socket/socketConnection");
+const { authenticateToken } = require("./app/utils/auth");
 
-const accountsRouter = require("./routers/accountsRouter");
-const internshipsRouter = require("./routers/internshipsRouter");
-const socialRouter = require("./routers/socialRouter");
+const accountsRouter = require("./app/routers/accountsRouter");
+const internshipsRouter = require("./app/routers/internshipsRouter");
+const socialRouter = require("./app/routers/socialRouter");
 
 require("dotenv").config();
 
@@ -24,7 +24,6 @@ const port = process.env.PORT || 5000;
 
 app.use(cookieParser());
 app.use(express.json());
-app.use(express.static("media"));
 app.use(
 	cors({
 		origin: [
@@ -37,6 +36,7 @@ app.use(
 		secure: true,
 	})
 );
+app.use(express.static('public'));
 
 /* mongodb database connection */
 

@@ -19,10 +19,8 @@ const {
 	validateStudentDetails,
 	validateEmail,
 } = require("../utils/validators");
-const {
-	deleteProfilePicture,
-	deleteResume,
-} = require("../utils/staticStorage");
+const { imageKit, deleteMedia } = require("../utils/mediaStorage");
+const { readFileSync } = require("fs");
 
 /* general methods */
 
@@ -100,7 +98,7 @@ const createStudentAccount = async (req, res) => {
 	});
 	if (!account) return;
 	const accessToken = generateAccessToken(account);
-	res.cookie("accessToken", accessToken, {sameSite: 'None', secure: true});
+	res.cookie("accessToken", accessToken, { sameSite: "None", secure: true });
 	res.status(201).json({
 		success: true,
 		body: { message: "Account created successfully", account },
@@ -139,7 +137,7 @@ const createCollegeAccount = async (req, res) => {
 	if (!account) return;
 
 	const accessToken = generateAccessToken(account);
-	res.cookie("accessToken", accessToken, {sameSite: 'None', secure: true});
+	res.cookie("accessToken", accessToken, { sameSite: "None", secure: true });
 	res.status(201).json({
 		success: true,
 		body: { message: "Account created successfully", account },
@@ -147,14 +145,8 @@ const createCollegeAccount = async (req, res) => {
 };
 
 const createCompanyAccount = async (req, res) => {
-	const {
-		email,
-		password,
-		description,
-		contactNumber,
-		name,
-		address,
-	} = req.body;
+	const { email, password, description, contactNumber, name, address } =
+		req.body;
 	const details = { name, address };
 	if (
 		!(await accountExists(res, email)) ||
@@ -177,7 +169,7 @@ const createCompanyAccount = async (req, res) => {
 	if (!account) return;
 
 	const accessToken = generateAccessToken(account);
-	res.cookie("accessToken", accessToken, {sameSite: 'None', secure: true});
+	res.cookie("accessToken", accessToken, { sameSite: "None", secure: true });
 	res.status(201).json({
 		success: true,
 		body: { message: "Account created successfully", account },
@@ -185,12 +177,15 @@ const createCompanyAccount = async (req, res) => {
 };
 
 const getAccount = async (req, res) => {
-	const {_id} = req.params
+	const { _id } = req.params;
 	const account = await Account.findById(_id);
-	if(!account) 
-		return res.json({success: false, body: {error: 'Account does not exists.'}})
-	res.json({success: true, body: {account}})
-}
+	if (!account)
+		return res.json({
+			success: false,
+			body: { error: "Account does not exists." },
+		});
+	res.json({ success: true, body: { account } });
+};
 
 const login = async (req, res) => {
 	const { email, password } = req.body;
@@ -213,7 +208,7 @@ const login = async (req, res) => {
 			.json({ success: false, body: { error: "Incorrect password" } });
 
 	const accessToken = generateAccessToken(account);
-	res.cookie("accessToken", accessToken, {sameSite: 'None', secure: true});
+	res.cookie("accessToken", accessToken, { sameSite: "None", secure: true });
 
 	res.json({
 		success: true,
@@ -328,39 +323,76 @@ const searchAccounts = async (req, res) => {
 };
 
 const getAccountIds = async (req, res) => {
-	const _ids = await Account.find({}, ['_id'])
-	res.json({success: true, body: {_ids}})
-}
+	const _ids = await Account.find({}, ["_id"]);
+	res.json({ success: true, body: { _ids } });
+};
 
 const uploadResume = async (req, res) => {
 	const {
 		params: { _id },
-		file: { filename },
+		file,
 	} = req;
+	const type = file.mimetype.split("/")[1];
+	const fileName = file.filename;
+	if (type !== "pdf")
+		return res.json({
+			success: false,
+			body: { error: "Invalid file type." },
+		});
 	const account = await Account.findById(_id);
-	if (account.details.resume) deleteResume(account.details.resume);
-	account.details = { ...account.details, resume: filename };
-	await account.save();
-	res.json({
-		success: true,
-		body: { message: "Resume uploaded", account },
-	});
+	const image = readFileSync("public/" + fileName);
+	imageKit.upload(
+		{ file: image, fileName: fileName.split(".")[0] },
+		async (err, result) => {
+			if (err)
+				return res.json({
+					success: false,
+					body: { error: "Failed to upload." },
+				});
+			const resume = result.name;
+			account.details = {...account.details, resume};
+			await account.save();
+			deleteMedia(fileName);
+			res.json({
+				success: true,
+				body: { message: "Profile picture uploaded", account },
+			});
+		}
+	);
 };
 
 const uploadProfilePicture = async (req, res) => {
 	const {
 		params: { _id },
-		file: { filename },
+		file,
 	} = req;
+	const type = file.mimetype.split("/")[0];
+	const fileName = file.filename;
+	if (type !== "image")
+		return res.json({
+			success: false,
+			body: { error: "Invalid file type." },
+		});
 	const account = await Account.findById(_id);
-	if (account.profilePicture !== "default.png" && account.profilePicture)
-		deleteProfilePicture(account.profilePicture);
-	account.profilePicture = filename;
-	await account.save();
-	res.json({
-		success: true,
-		body: { message: "Profile picture uploaded", account },
-	});
+	const image = readFileSync("public/" + fileName);
+	imageKit.upload(
+		{ file: image, fileName: fileName.split(".")[0] },
+		async (err, result) => {
+			if (err)
+				return res.json({
+					success: false,
+					body: { error: "Failed to upload." },
+				});
+			const profilePicture = result.name;
+			account.profilePicture = profilePicture;
+			await account.save();
+			deleteMedia(fileName);
+			res.json({
+				success: true,
+				body: { message: "Profile picture uploaded", account },
+			});
+		}
+	);
 };
 
 module.exports = {

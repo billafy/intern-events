@@ -2,6 +2,8 @@ const { Account, Post, Message } = require("../schema/models");
 const { sortPosts, currentDateTimestamp, sortChats } = require("../utils/utils");
 const { accountExists } = require("../utils/validators");
 const { idify } = require("../utils/utils");
+const { imageKit, deleteMedia } = require("../utils/mediaStorage");
+const {readFileSync} = require('fs');
 
 const commentPopulate = {
 	path: "comments",
@@ -37,27 +39,37 @@ const createPost = async (req, res) => {
 	const {
 		params: { _id },
 		body: { content },
+		file,
 	} = req;
-	let filename = "";
-	if (req.file) filename = req.file.filename;
-	if (!content && !filename)
+	let fileName = "";
+	if (file) fileName = file.filename;
+	if (!content && !fileName)
 		return res.json({
 			success: false,
 			body: {
 				error: "A post should contain either content or a media file.",
 			},
 		});
-	const post = new Post({
-		content: content || "",
-		media: filename || "",
-		likes: [],
-		comments: [],
-		accountId: _id,
-		postedBy: _id,
-		creationDate: currentDateTimestamp(),
-	});
-	await post.save();
-	res.json({ success: true, post });
+	const post = readFileSync("public/" + fileName);
+	imageKit.upload({file: post, fileName: fileName.split('.')[0]}, async (err, result) => {
+		if (err)
+			return res.json({
+				success: false,
+				body: { error: "Failed to upload." },
+			});
+		const post = new Post({
+			content: content || "",
+			media: result.name || "",
+			likes: [],
+			comments: [],
+			accountId: _id,
+			postedBy: _id,
+			creationDate: currentDateTimestamp(),
+		});
+		await post.save();
+		res.json({ success: true, post });
+		deleteMedia(fileName);
+	})
 };
 
 const deletePost = async (req, res) => {
