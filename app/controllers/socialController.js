@@ -1,9 +1,12 @@
 const { Account, Post, Message } = require("../schema/models");
-const { sortPosts, currentDateTimestamp, sortChats } = require("../utils/utils");
-const { accountExists } = require("../utils/validators");
+const {
+	sortPosts,
+	currentDateTimestamp,
+	sortChats,
+} = require("../utils/utils");
 const { idify } = require("../utils/utils");
 const { imageKit, deleteMedia } = require("../utils/mediaStorage");
-const {readFileSync} = require('fs');
+const { readFileSync } = require("fs");
 
 const commentPopulate = {
 	path: "comments",
@@ -51,25 +54,28 @@ const createPost = async (req, res) => {
 			},
 		});
 	const post = readFileSync("public/" + fileName);
-	imageKit.upload({file: post, fileName: fileName.split('.')[0]}, async (err, result) => {
-		if (err)
-			return res.json({
-				success: false,
-				body: { error: "Failed to upload." },
+	imageKit.upload(
+		{ file: post, fileName: fileName.split(".")[0] },
+		async (err, result) => {
+			if (err)
+				return res.json({
+					success: false,
+					body: { error: "Failed to upload." },
+				});
+			const post = new Post({
+				content: content || "",
+				media: result.name || "",
+				likes: [],
+				comments: [],
+				accountId: _id,
+				postedBy: _id,
+				creationDate: currentDateTimestamp(),
 			});
-		const post = new Post({
-			content: content || "",
-			media: result.name || "",
-			likes: [],
-			comments: [],
-			accountId: _id,
-			postedBy: _id,
-			creationDate: currentDateTimestamp(),
-		});
-		await post.save();
-		res.json({ success: true, post });
-		deleteMedia(fileName);
-	})
+			await post.save();
+			res.json({ success: true, post });
+			deleteMedia(fileName);
+		}
+	);
 };
 
 const deletePost = async (req, res) => {
@@ -198,28 +204,33 @@ const followAccount = async (req, res) => {
 
 const getChats = async (req, res) => {
 	const _id = req.account._id;
-	const messages = await Message.find({ $or: [{ from: _id }, { to: _id }] }).populate('from').populate('to');
-	let chats = {}
-	messages.forEach(message => {
-		const to = message.to._id.toString(), from = message.from._id.toString();
-		if(to === _id) {
-			if(!chats[from]) 
-				chats[from] = [];
+	const messages = await Message.find({ $or: [{ from: _id }, { to: _id }] })
+		.populate("from")
+		.populate("to");
+	let chats = {};
+	messages.forEach((message) => {
+		const to = message.to._id.toString(),
+			from = message.from._id.toString();
+		if (to === _id) {
+			if (!chats[from]) chats[from] = [];
 			chats[from].push(message);
-		}
-		else {
-			if(!chats[to]) 
-				chats[to] = [];
+		} else {
+			if (!chats[to]) chats[to] = [];
 			chats[to].push(message);
 		}
-	})
-	chats = Object.values(chats).map(chat => {
-		const newChat = chat.map(message => ({_id: message._id, text: message.text, from: message.from._id, to: message.to._id, dateTime: message.dateTime}))
-		if(chat[0].from._id.toString() === _id) 
-			return {account: chat[0].to, chat: newChat} 
-		else 
-			return {account: chat[0].from, chat: newChat}
-	})
+	});
+	chats = Object.values(chats).map((chat) => {
+		const newChat = chat.map((message) => ({
+			_id: message._id,
+			text: message.text,
+			from: message.from._id,
+			to: message.to._id,
+			dateTime: message.dateTime,
+		}));
+		if (chat[0].from._id.toString() === _id)
+			return { account: chat[0].to, chat: newChat };
+		else return { account: chat[0].from, chat: newChat };
+	});
 	chats.sort(sortChats);
 	res.json({ success: true, body: { chats } });
 };

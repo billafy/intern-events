@@ -7,8 +7,8 @@ const socketIo = require("socket.io");
 const cookieParser = require("cookie-parser");
 
 const socketConnection = require("./app/socket/socketConnection");
-const { authenticateToken } = require("./app/utils/auth");
 
+const authRouter = require("./app/routers/authRouter");
 const accountsRouter = require("./app/routers/accountsRouter");
 const internshipsRouter = require("./app/routers/internshipsRouter");
 const socialRouter = require("./app/routers/socialRouter");
@@ -36,7 +36,7 @@ app.use(
 		secure: true,
 	})
 );
-app.use(express.static('public'));
+app.use(express.static("public"));
 
 /* mongodb database connection */
 
@@ -55,6 +55,7 @@ mongoose.connection.on("open", () => {
 
 /* api */
 
+app.use("/auth", authRouter);
 app.use("/accounts", accountsRouter);
 app.use("/internships", internshipsRouter);
 app.use("/social", socialRouter);
@@ -69,7 +70,7 @@ const server = app.listen(port, () => {
 
 const io = socketIo(server, {
 	cors: {
-		origin: ["http://localhost:3000", 'https://internly.vercel.app'],
+		origin: ["http://localhost:3000", "https://internly.vercel.app"],
 		credentials: true,
 		sameSite: "None",
 		secure: true,

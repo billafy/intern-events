@@ -1,6 +1,6 @@
 const { Internship } = require("../schema/models");
 const { validateInternshipInput } = require("../utils/validators");
-const { getFormattedDate, currentDateTimestamp } = require("../utils/utils");
+const { getFormattedDate } = require("../utils/utils");
 const { v4 } = require("uuid");
 
 const getInternship = async (req, res) => {
@@ -33,19 +33,20 @@ const getInternships = async (req, res) => {
 };
 
 const myAppliedInternships = async (req, res) => {
-	const {_id} = req.params;
+	const { _id } = req.params;
 	const internships = await Internship.find({}).populate("companyId");
-	let newInternships = await internships.map(internship => {
-		const application = internship.applications.find(application => application.studentId.toString() === _id)
-		if(!application) 
-			return null;
+	let newInternships = await internships.map((internship) => {
+		const application = internship.applications.find(
+			(application) => application.studentId.toString() === _id
+		);
+		if (!application) return null;
 		const newInternship = internship._doc;
 		delete newInternship.applications;
-		return {...newInternship, application};
-	})
-	newInternships = newInternships.filter(internship => internship);
-	res.json({success: true, body: {internships: newInternships}});
-}
+		return { ...newInternship, application };
+	});
+	newInternships = newInternships.filter((internship) => internship);
+	res.json({ success: true, body: { internships: newInternships } });
+};
 
 const getCompanyInternships = async (req, res) => {
 	const companyId = req.account._id;
@@ -126,19 +127,24 @@ const updateApplicationStatus = async (req, res) => {
 	try {
 		if (status !== "Rejected" && status !== "In Touch")
 			throw "Invalid application status";
-		let internship = await Internship.findById(internshipId)
+		let internship = await Internship.findById(internshipId);
 		if (!internship) throw "Internship does not exist.";
 		if (_id !== internship.companyId.toString())
 			throw "Not allowed to update.";
-		const newApplications = internship.applications.map(application => {
-			if(String(application._id) == applicationId) {
+		const newApplications = internship.applications.map((application) => {
+			if (String(application._id) == applicationId) {
 				let newApplication = application;
 				newApplication.status = status;
 				return newApplication;
 			}
 			return application;
-		})
-		internship = await Internship.findByIdAndUpdate(internshipId, {applications: newApplications}, {new: true}).populate("companyId")
+		});
+		internship = await Internship.findByIdAndUpdate(
+			internshipId,
+			{ applications: newApplications },
+			{ new: true }
+		)
+			.populate("companyId")
 			.populate({
 				path: "applications",
 				populate: {

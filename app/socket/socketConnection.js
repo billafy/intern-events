@@ -16,12 +16,19 @@ const sendMessage = async (socket, from, to, text) => {
 	const exists = await Account.exists({ _id: ObjectId(to) });
 	if (!exists) return;
 
-	const message = new Message({from, to, text, dateTime: new Date().toString()});
-	await message.save()
+	const message = new Message({
+		from,
+		to,
+		text,
+		dateTime: new Date().toString(),
+	});
+	await message.save();
 
 	if (socketIds[to]) {
 		socketIds[to].forEach((socketId) => {
-			socket.to(socketId).emit("message", {success: true, body: {message}});
+			socket
+				.to(socketId)
+				.emit("message", { success: true, body: { message } });
 		});
 	}
 };

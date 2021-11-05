@@ -1,4 +1,4 @@
-const {Schema, model} = require('mongoose')
+const { Schema, model } = require("mongoose");
 
 const accountSchema = new Schema({
 	email: String,
@@ -11,7 +11,7 @@ const accountSchema = new Schema({
 	creationDate: String,
 	profilePicture: String,
 	details: Object,
-})
+});
 
 /* const studentSchema = new Schema({
 	firstName: String,
@@ -48,15 +48,17 @@ const internshipSchema = new Schema({
 	applicationEnd: String,
 	category: String,
 	numberOfPositions: Number,
-	companyId: {type: Schema.Types.ObjectId, ref: 'Account'},
-	applications: [{
-		_id: String,
-		message: String,
-		dateTime: String,
-		status: String,
-		studentId: {type: Schema.Types.ObjectId, ref: 'Account'},
-	}]
-})
+	companyId: { type: Schema.Types.ObjectId, ref: "Account" },
+	applications: [
+		{
+			_id: String,
+			message: String,
+			dateTime: String,
+			status: String,
+			studentId: { type: Schema.Types.ObjectId, ref: "Account" },
+		},
+	],
+});
 
 const eventSchema = new Schema({
 	title: String,
@@ -66,45 +68,43 @@ const eventSchema = new Schema({
 	status: String,
 	fee: Number,
 	prize: String,
-	collegeId: {type: Schema.Types.ObjectId, ref: 'Account'},
-	participants: [{
-		_id: String,
-		studentId: {type: Schema.Types.ObjectId, ref: 'Account'},
-	}]
-})
+	collegeId: { type: Schema.Types.ObjectId, ref: "Account" },
+	participants: [
+		{
+			_id: String,
+			studentId: { type: Schema.Types.ObjectId, ref: "Account" },
+		},
+	],
+});
 
 const postSchema = new Schema({
 	content: String,
 	media: String,
-	likes: [{type: Schema.Types.ObjectId, ref: 'Account'}],
+	likes: [{ type: Schema.Types.ObjectId, ref: "Account" }],
 	accountId: String,
-	postedBy: {type: Schema.Types.ObjectId, ref: 'Account'},
+	postedBy: { type: Schema.Types.ObjectId, ref: "Account" },
 	creationDate: String,
-	comments: [{
-		_id: String,
-		text: String,
-		commentedBy: {type: Schema.Types.ObjectId, ref: 'Account'},
-		likes: Number,
-	}]
-})
+	comments: [
+		{
+			_id: String,
+			text: String,
+			commentedBy: { type: Schema.Types.ObjectId, ref: "Account" },
+			likes: Number,
+		},
+	],
+});
 
 const messageSchema = new Schema({
 	text: String,
 	dateTime: String,
-	from: {type: Schema.Types.ObjectId, ref: 'Account'},
-	to: {type: Schema.Types.ObjectId, ref: 'Account'}
-})
+	from: { type: Schema.Types.ObjectId, ref: "Account" },
+	to: { type: Schema.Types.ObjectId, ref: "Account" },
+});
 
 module.exports = {
-	Account: model('Account', accountSchema),
-	Internship: model('Internship', internshipSchema),
-	Event: model('Event', eventSchema),
-	Post: model('Post', postSchema),
-	Message: model('Message', messageSchema),
-}
-
-/*
-61011d8e34d83312500955b7
-6167149f5a7470185887be24
-616d21425e99a0425067b3ca
-*/
+	Account: model("Account", accountSchema),
+	Internship: model("Internship", internshipSchema),
+	Event: model("Event", eventSchema),
+	Post: model("Post", postSchema),
+	Message: model("Message", messageSchema),
+};

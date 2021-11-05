@@ -21,13 +21,12 @@ const comparePassword = async (password, hashedPassword) => {
 
 const getAccountId = async (accessToken) => {
 	try {
-		const account = jwt.verify(accessToken, ACCESS_TOKEN_SECRET)
+		const account = jwt.verify(accessToken, ACCESS_TOKEN_SECRET);
 		return account._id;
-	}
-	catch {
+	} catch {
 		return false;
 	}
-}
+};
 
 const generateAccessToken = (account) => {
 	return jwt.sign(
@@ -50,12 +49,10 @@ const verifyAccessToken = async (req, res, next) => {
 			.json({ success: false, body: { error: "No access token" } });
 	jwt.verify(accessToken, ACCESS_TOKEN_SECRET, async (err, account) => {
 		if (err || (_id && _id !== account._id))
-			return res
-				.status(401)
-				.json({
-					success: false,
-					body: { error: "Invalid access token" },
-				});
+			return res.status(401).json({
+				success: false,
+				body: { error: "Invalid access token" },
+			});
 		req.account = account;
 		next();
 	});

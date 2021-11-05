@@ -1,8 +1,7 @@
 const multer = require("multer");
 const { unlink } = require("fs");
 const ImageKit = require("imagekit");
-const { v4 } = require("uuid");
-const {readFileSync} = require('fs');
+const { readFileSync } = require("fs");
 
 const imageKit = new ImageKit({
 	publicKey: process.env.IMAGE_KIT_PUBLIC_KEY,

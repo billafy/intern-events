@@ -56,9 +56,10 @@ const sortPosts = (post1, post2) => {
 };
 
 const sortChats = (chat1, chat2) => {
-	const lastText1 = chat1.chat[chat1.chat.length - 1], lastText2 = chat2.chat[chat2.chat.length - 1];
+	const lastText1 = chat1.chat[chat1.chat.length - 1],
+		lastText2 = chat2.chat[chat2.chat.length - 1];
 	return new Date(lastText1.dateTime) > new Date(lastText2.dateTime) ? -1 : 1;
-}
+};
 
 module.exports = {
 	currentDateTimestamp,
